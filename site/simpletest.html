@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple n8n File Uploader</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 40px auto; padding: 20px; background: #f4f4f9; }
+        .card { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { color: #333; }
+        button { background: #ff6d5a; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        button:hover { background: #ff5039; }
+        button:disabled { background: #ccc; }
+        input[type="file"] { margin: 20px 0; display: block; }
+        .hidden { display: none; }
+        #status { margin-top: 15px; font-weight: bold; color: #555; }
+        code { background: #eee; padding: 4px; border-radius: 4px; word-break: break-all; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>n8n Static Uploader</h2>
+        
+        <!-- SECTION 1: Start -->
+        <div id="step-1">
+            <p>Click below to start the workflow and get the Resume URL.</p>
+            <button onclick="startWorkflow()">Start Process</button>
+        </div>
+
+        <!-- SECTION 2: Upload -->
+        <div id="step-2" class="hidden">
+            <p>Workflow Started! Waiting for file...</p>
+            <p style="font-size: 0.9em; color: #666;">Resume URL: <code id="resume-url-display">...</code></p>
+            
+            <input type="file" id="file-input">
+            <button onclick="uploadFile()" id="btn-upload">Upload File</button>
+        </div>
+
+        <div id="status"></div>
+    </div>
+
+    <script>
+        // --- CONFIGURATION ---
+        // Paste your Production Webhook URL here
+        const WEBHOOK_URL = 'https://n8n.srv1061096.hstgr.cloud/webhook/simple-test'; 
+
+        let resumeUrl = '';
+
+        async function startWorkflow() {
+            updateStatus('Connecting to n8n...');
+            
+            try {
+                // 1. Call the Webhook directly
+                const response = await fetch(WEBHOOK_URL, { 
+                    method: 'POST' 
+                });
+
+                if (!response.ok) throw new Error(`n8n Error: ${response.statusText}`);
+
+                // 2. Capture the JSON response
+                const data = await response.json();
+                
+                if (data.resumeUrl) {
+                    resumeUrl = data.resumeUrl;
+                    
+                    // Switch UI to Step 2
+                    document.getElementById('step-1').classList.add('hidden');
+                    document.getElementById('step-2').classList.remove('hidden');
+                    document.getElementById('resume-url-display').textContent = resumeUrl;
+                    updateStatus('Ready to upload.');
+                } else {
+                    throw new Error('No resumeUrl found in response.');
+                }
+
+            } catch (error) {
+                console.error(error);
+                updateStatus('Error: ' + error.message);
+                if (error.message.includes('Failed to fetch')) {
+                     updateStatus('CORS Error: Ensure your n8n "Respond to Webhook" node sends Access-Control-Allow-Origin: *');
+                }
+            }
+        }
+
+        async function uploadFile() {
+            const fileInput = document.getElementById('file-input');
+            const file = fileInput.files[0];
+
+            if (!file) return updateStatus('Please select a file first.');
+            if (!resumeUrl) return updateStatus('No Resume URL found.');
+
+            updateStatus('Uploading...');
+
+            try {
+                // 3. Send file directly to the Resume URL
+                const formData = new FormData();
+                formData.append('data', file); // 'data' is the default binary property in n8n
+
+                const response = await fetch(resumeUrl, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    updateStatus('File Uploaded Successfully! Workflow Resumed.');
+                    document.getElementById('btn-upload').disabled = true;
+                } else {
+                    updateStatus('Upload Failed: ' + response.statusText);
+                }
+
+            } catch (error) {
+                console.error(error);
+                updateStatus('Error uploading: ' + error.message);
+            }
+        }
+
+        function updateStatus(msg) {
+            document.getElementById('status').textContent = msg;
+        }
+    </script>
+
+</body>
+</html>

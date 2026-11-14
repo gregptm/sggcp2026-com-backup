@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Protected File Index</title>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    #content { display: none; }
+    #login { max-width: 320px; margin: 100px auto; }
+    label, input, button { display:block; width:100%; margin: 10px 0; }
+  </style>
+</head>
+<body>
+
+<div id="login">
+  <h2>Login</h2>
+  <label>Username</label>
+  <input id="username" autocomplete="off" />
+  <label>Password</label>
+  <input id="password" type="password" />
+  <button id="btn">Login</button>
+</div>
+
+<div id="content">
+  <h1>File List</h1>
+  <ul>
+    <li><a href="Default.html">Default.html</a></li>
+    <li><a href="index.html">index.html</a></li>
+    <li><a href="index_1.html">index_1.html</a></li>
+    <li><a href="simpletest.html">simpletest.html</a></li>
+    <li><a href="taccma_form.html">taccma_form.html</a></li>
+    <li><a href="taccma_form_images_not_workflow_ideal.html">taccma_form_images_not_workflow_ideal.html</a></li>
+    <li><a href="taccma_form_works_no_image_thumbnails.html">taccma_form_works_no_image_thumbnails.html</a></li>
+    <li><a href="taccma_working_reply.html">taccma_working_reply.html</a></li>
+    <li><a href="taccma_working_reply_hold.html">taccma_working_reply_hold.html</a></li>
+    <li><a href="taccma_reply_2.html">taccma_reply_2.html</a></li>
+    <li><a href="test_form_1.html">test_form_1.html</a></li>
+    <li><a href="test_form_1_bad.html">test_form_1_bad.html</a></li>
+    <li><a href="test_reply_1.html">test_reply_1.html</a></li>
+    <li><a href="test_reply_2.html">test_reply_2.html</a></li>
+  </ul>
+</div>
+
+<script>
+  // CHANGE THESE
+  const VALID_USER = "admin";
+  const VALID_PASS = "password123";
+
+  document.getElementById("btn").addEventListener("click", () => {
+    const u = document.getElementById("username").value;
+    const p = document.getElementById("password").value;
+
+    if (u === VALID_USER && p === VALID_PASS) {
+      document.getElementById("login").remove();
+      document.getElementById("content").style.display = "block";
+    } else {
+      alert("Invalid username or password");
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Reimbursement Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* --- PRINT SPECIFIC FIXES --- */
+        @media print {
+            body { 
+                background-color: white !important; 
+                -webkit-print-color-adjust: exact !important; /* Chrome/Safari force colors */
+                print-color-adjust: exact !important; /* Firefox/Standard force colors */
+            }
+            
+            /* Hide buttons and non-form elements */
+            .no-print { 
+                display: none !important; 
+            }
+            
+            /* Ensure shadow doesn't look weird in print */
+            .shadow-2xl { 
+                box-shadow: none !important; 
+                border: none !important;
+            }
+            
+            /* Force the container to fill the page width */
+            .main-container {
+                max-width: 100% !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                border: none !important;
+            }
+
+            /* Ensure inputs show their text clearly */
+            input {
+                border-bottom: 1px solid #000 !important;
+            }
+        }
+
+        /* --- CUSTOM STYLING --- */
+        .paper-input {
+            border-bottom: 1px solid #4b5563;
+            border-radius: 0;
+            padding-left: 0.25rem;
+            padding-right: 0.25rem;
+            background-color: transparent;
+            transition: border-color 0.2s;
+        }
+        .paper-input:focus {
+            outline: none;
+            border-bottom: 2px solid #2563eb;
+            background-color: #f3f4f6;
+        }
+        
+        /* Main Business/Typewriter font for most inputs */
+        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Kalam:wght@400;700&display=swap');
+        .business-font {
+            font-family: 'Courier Prime', monospace;
+            color: #111827;
+            font-size: 1rem;
+            font-weight: 600; /* Slightly bolder to look like ink/type */
+            letter-spacing: -0.02em;
+        }
+        
+        /* Cursive font specifically for signature */
+        .cursive-signature {
+            font-family: 'Kalam', cursive;
+            color: #1f2937;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: normal;
+            font-style: italic;
+        }
+
+        .business-font::placeholder {
+            font-family: 'Courier Prime', monospace;
+            opacity: 0.6;
+            font-weight: 400;
+        }
+        .cursive-signature::placeholder {
+            font-family: 'Kalam', cursive;
+            opacity: 0.6;
+            font-weight: 400;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen py-10 px-4 font-sans text-gray-800">
+
+    <div class="main-container max-w-4xl mx-auto bg-white shadow-2xl border border-gray-200 p-8 md:p-12 relative">
+        
+        <!-- Header Section -->
+        <header class="flex flex-col items-center justify-center mb-10 text-center space-y-2">
+            
+            <!-- Logo -->
+            <img src="https://teamwork-agility-club.org/wp-content/uploads/2018/01/cropped-taccma_logo_1024_seethru_tpng.png" 
+                 alt="Teamwork Agility Club" 
+                 class="w-36 h-36 object-contain mb-2">
+
+            <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-gray-900">Teamwork Agility Club of Central Massachusetts</h1>
+            <h2 class="text-sm md:text-base font-semibold tracking-wider text-gray-600 uppercase">Expense/Invoice/Reimbursement Form</h2>
+        </header>
+
+        <!-- Main Form Fields -->
+        <!-- *** FIXED: Reverting to Native HTML Form Submission *** -->
+        <!-- ACTION is set to the successful N8N webhook endpoint -->
+        <!-- ENCTYPE is crucial for handling files in a native POST -->
+
+        <!--"https://n8n.srv1061096.hstgr.cloud/webhook/expense_form_submission" --> 
+        <form id="reimbursementForm" 
+              action="https://n8n.srv1061096.hstgr.cloud/webhook/submit-expense" 
+              method="POST" 
+              enctype="multipart/form-data" 
+              class="space-y-6">
+            
+            <input type="hidden" id="form_name" name="form_name" value="">
+
+            <section class="grid grid-cols-1 gap-y-4 md:gap-x-8">
+                <!-- Remit To -->
+                <div class="flex flex-col md:flex-row md:items-end">
+                    <label for="remit" class="w-32 text-sm font-bold text-gray-700 mb-1 md:mb-0 shrink-0">REMIT TO</label>
+                    <input type="text" name="remit_to" id="remit" placeholder="Kristin Conroy" class="paper-input w-full business-font h-8">
+                </div>
+
+                <!-- Address -->
+                <div class="flex flex-col md:flex-row md:items-end">
+                    <label for="address" class="w-32 text-sm font-bold text-gray-700 mb-1 md:mb-0 shrink-0">Address</label>
+                    <input type="text" name="address" id="address" placeholder="3 Worcester Ave. Hudson, MA 01749" class="paper-input w-full business-font h-8">
+                </div>
+
+                <!-- Amount -->
+                <div class="flex flex-col md:flex-row md:items-end">
+                    <label for="amount" class="w-32 text-sm font-bold text-gray-700 mb-1 md:mb-0 shrink-0">Amount</label>
+                    <input type="text" name="amount" id="amount" placeholder="$534.45" class="paper-input w-full md:w-1/3 business-font h-8 font-bold">
+                </div>
+
+                <!-- For -->
+                <div class="flex flex-col md:flex-row md:items-end">
+                    <label for="purpose" class="w-32 text-sm font-bold text-gray-700 mb-1 md:mb-0 shrink-0">For</label>
+                    <input type="text" name="purpose" id="purpose" placeholder="AKC ScentWork Trial" class="paper-input w-full business-font h-8">
+                </div>
+
+                <!-- Signature -->
+                <div class="flex flex-col md:flex-row md:items-end">
+                    <label for="signature" class="w-32 text-sm font-bold text-gray-700 mb-1 md:mb-0 shrink-0">Signature</label>
+                    <input type="text" name="signature" id="signature" placeholder="Kristin Conroy" class="paper-input w-full cursive-signature h-8">
+                </div>
+                
+                <p class="text-xs text-gray-500 mt-1 ml-0 md:ml-32 italic">Please attach receipts and/or itemize expenses:</p>
+            </section>
+
+            <!-- Image Upload Section -->
+            <section class="mt-6 border-t border-gray-300 pt-4">
+                <label class="block text-sm font-bold text-gray-700 mb-2">Attach Receipts / Photos</label>
+                
+                <!-- Input Area: Simplified for native submission -->
+                <div class="flex items-center space-x-4 bg-gray-50 p-4 rounded border border-dashed border-gray-400">
+                    <label class="cursor-pointer flex items-center justify-center bg-white border border-gray-300 rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500 px-4 py-2 shadow-sm transition-colors">
+                        <i class="fa-solid fa-camera mr-2"></i>
+                        <span>Select File(s)</span>
+                        <!-- Changed name to 'attachments' for N8N to easily find files -->
+                        <input type="file" id="receipt-upload" name="attachments" accept="image/*" multiple class="sr-only">
+                    </label>
+                    <span class="text-xs text-gray-500">Select images.</span>
+                </div>
+                
+                <!-- NOTE: Preview functionality is removed as it relies on complex JS logic -->
+            </section>
+
+            <!-- Action Buttons -->
+            <div class="mt-8 flex flex-col md:flex-row justify-center gap-4 no-print">
+                
+                <!-- Submit Button -->
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-8 rounded shadow-lg transition duration-200 flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-paper-plane mr-2"></i> Submit Request
+                </button>
+
+                <!-- Secondary Buttons -->
+                <div class="flex justify-center gap-4">
+                    <button type="button" onclick="window.print()" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded shadow-lg transition duration-200 flex items-center">
+                        <i class="fa-solid fa-print mr-2"></i> Print / PDF
+                    </button>
+                    <button type="button" onclick="document.getElementById('reimbursementForm').reset()" class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-6 border border-gray-400 rounded shadow transition duration-200">
+                        Clear Form
+                    </button>
+                </div>
+            </div>
+
+            <!-- Version Indicator -->
+            <div class="text-center mt-6 pt-4 border-t border-gray-100">
+                <p class="text-[10px] text-gray-400 font-mono">Version 2.0 - Native POST</p>
+            </div>
+
+        </form>
+    </div>
+
+    <!-- Removed all problematic JavaScript that relied on 'fetch' and complex file handling -->
+    <script>
+        // Simple script to reset the form.
+        function resetForm() {
+            document.getElementById('reimbursementForm').reset();
+            // Note: File inputs cannot be programmatically cleared easily, rely on form.reset()
+        }
+    </script>
+
+
+    <script>
+        let filename = window.location.pathname.split("/").pop();
+        filename = filename.replace(/\.[^/.]+$/, ""); 
+
+        const formNameInput = document.getElementById("form_name");
+        if (formNameInput) {
+            formNameInput.value = filename || "unknown_form";
+        }
+    </script>  
+
+</body>
+</html>

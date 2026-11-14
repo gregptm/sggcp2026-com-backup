@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processing Your Request</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+
+    <script>
+        // Delay before POST redirect (in milliseconds)
+        const delay = 1000; // 1 second
+
+        window.onload = function () {
+            // 1) Read uuid from query string
+            const params = new URLSearchParams(window.location.search);
+            const uuid = params.get('uuid');
+
+            // 2) Set hidden uuid field
+            const uuidInput = document.getElementById('uuid');
+            if (uuidInput && uuid) {
+                uuidInput.value = uuid;
+                console.log('uuid set to:', uuid);
+            }
+
+            // 3) Set form_name from filename
+            let filename = window.location.pathname.split('/').filter(Boolean).pop() || '';
+            filename = filename.replace(/\.[^/.]+$/, ''); // remove extension
+            const formNameInput = document.getElementById('form_name');
+            if (formNameInput) {
+                formNameInput.value = filename || 'unknown_form';
+                console.log('form_name set to:', formNameInput.value);
+            }
+
+            // 4) Submit after delay
+            setTimeout(function () {
+                document.getElementById("postForm").submit();
+            }, delay);
+        };
+    </script>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <!-- Hidden auto-submit POST form -->
+    <form id="postForm" 
+          action="https://n8n.srv1061096.hstgr.cloud/webhook/submit-expense" 
+          method="POST">
+        <input type="hidden" id="form_name" name="form_name" value="">
+        <input type="hidden" id="uuid" name="uuid" value="">
+    </form>
+
+    <div class="w-full max-w-sm bg-white p-10 rounded-2xl shadow-xl border-t-4 border-yellow-500 text-center">
+        <svg class="mx-auto h-12 w-12 text-yellow-500 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+
+        <h1 class="text-2xl font-bold mt-4 text-gray-800">Request Received!</h1>
+        <p class="text-gray-600 mt-2 mb-4">Thank you for your submission. Your request is being processed in the background.</p>
+        <p class="text-sm text-yellow-600 font-medium">Please wait a moment while we fetch the results...</p>
+
+        <div class="mt-6 text-xs text-gray-400">
+            (You will be redirected automatically.)
+        </div>
+    </div>
+</body>
+</html>
